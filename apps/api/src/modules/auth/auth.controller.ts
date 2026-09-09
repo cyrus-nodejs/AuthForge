@@ -150,7 +150,12 @@ import {
       @Body() dto: VerifyMagicLinkDto,
     ) {
       const result =
-        await this.magicLinks.verify(dto);
+  await this.magicLinks.verify({
+    attemptId: dto.loginAttemptId,
+    challengeId: dto.challengeId,
+    token: dto.token,
+  });
+
   
       return {
         success: true,

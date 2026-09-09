@@ -10,7 +10,10 @@ import {
   import {
     PasskeyAuthenticationService,
   } from './passkey-authentication.service';
-  import { PasskeyVerifyDto } from './dto/passkey-verify.dto';
+
+import { PasskeyRegistrationVerifyDto } from './dto/passkey-registration-verify.dto';
+import { PasskeyAuthenticationVerifyDto } from './dto/passkey-authentication-verify.dto';
+
   import { Public } from '../../common/auth/public.decorator';
   
   @Controller('auth/passkey')
@@ -39,7 +42,7 @@ import {
     @Post('register/verify')
     @HttpCode(HttpStatus.OK)
     async registrationVerify(
-      @Body() dto: PasskeyVerifyDto,
+      @Body() dto: PasskeyRegistrationVerifyDto,
     ) {
       return {
         success: true,
@@ -66,7 +69,7 @@ import {
     @Public()
     @HttpCode(HttpStatus.OK)
     async loginVerify(
-      @Body() dto: PasskeyVerifyDto,
+      @Body() dto: PasskeyAuthenticationVerifyDto,
     ) {
       return {
         success: true,

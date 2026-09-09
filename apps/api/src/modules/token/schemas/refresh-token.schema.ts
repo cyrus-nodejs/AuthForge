@@ -25,9 +25,12 @@ export class RefreshToken {
   @Prop({ required: true, index: true })
   tokenFamilyId!: string;
 
-  @Prop({ index: true })
-  parentTokenId?: string;
-
+  @Prop({ type: Types.ObjectId, ref: 'RefreshToken', index: true })
+  parentTokenId?: Types.ObjectId;
+  
+  @Prop()
+  rotatedAt?: Date;
+  
   @Prop({ required: true, default: 'active' })
   status!: string;
 

@@ -82,92 +82,112 @@ import {
     }
   
     async verify(input: {
-      challengeId: string;
-      code: string;
-    }) {
-      const challenge = await this.model
-        .findOne({
-          challengeId: input.challengeId,
-        })
-        .exec();
-  
-      if (!challenge) {
-        throw new UnauthorizedException(
-          'Invalid verification code',
-        );
-      }
-  
-      if (
-        challenge.status !== 'active' ||
-        challenge.expiresAt.getTime() <= Date.now()
-      ) {
-        throw new UnauthorizedException(
-          'Invalid verification code',
-        );
-      }
-  
-      if (
-        challenge.attemptCount >=
-        challenge.maxAttempts
-      ) {
-        challenge.status = 'locked';
-        await challenge.save();
-  
-        throw new UnauthorizedException(
-          'Invalid verification code',
-        );
-      }
-  
-      challenge.attemptCount += 1;
-  
-      if (
-        !this.crypto.hashesMatch(
-          input.code,
-          challenge.codeHash,
-        )
-      ) {
-        await challenge.save();
-  
-        throw new UnauthorizedException(
-          'Invalid verification code',
-        );
-      }
-  
-      const consumed = await this.replay.consume(
-        'otp',
-        challenge.challengeId,
-        900,
-      );
-  
-      if (!consumed) {
-        throw new UnauthorizedException(
-          'Invalid verification code',
-        );
-      }
-  
-      challenge.status = 'consumed';
-      challenge.consumedAt = new Date();
-  
-      await challenge.save();
-  
-      if (challenge.attemptId) {
-        const attempt =
-          await this.attempts.findByAttemptId(
-            challenge.attemptId,
-          );
-  
-        await this.attempts.complete(
-          attempt,
-          'otp',
-        );
-      }
-  
-      return {
-        authenticated: true,
-        userId: challenge.userId,
-      };
-    }
-  
+  challengeId: string;
+  code: string;
+}) {
+  const challenge = await this.model
+    .findOne({
+      challengeId: input.challengeId,
+      status: 'active',
+      expiresAt: { $gt: new Date() },
+    })
+    .exec();
+
+  if (!challenge) {
+    throw new UnauthorizedException(
+      'Invalid verification code',
+    );
+  }
+
+  const valid = this.crypto.hashesMatch(
+    input.code,
+    challenge.codeHash,
+  );
+
+  if (!valid) {
+    await this.model.findOneAndUpdate(
+      {
+        _id: challenge._id,
+        status: 'active',
+        expiresAt: { $gt: new Date() },
+        attemptCount: {
+          $lt: challenge.maxAttempts,
+        },
+      },
+      [
+        {
+          $set: {
+            attemptCount: {
+              $add: ['$attemptCount', 1],
+            },
+          },
+        },
+        {
+          $set: {
+            status: {
+              $cond: [
+                {
+                  $gte: [
+                    '$attemptCount',
+                    '$maxAttempts',
+                  ],
+                },
+                'locked',
+                'active',
+              ],
+            },
+          },
+        },
+      ],
+    ).exec();
+
+    throw new UnauthorizedException(
+      'Invalid verification code',
+    );
+  }
+
+  /*
+   * Atomically consume the challenge.
+   *
+   * If another request already consumed it, this
+   * query returns null.
+   */
+  const consumed = await this.model.findOneAndUpdate(
+    {
+      _id: challenge._id,
+      status: 'active',
+      expiresAt: { $gt: new Date() },
+    },
+    {
+      $set: {
+        status: 'consumed',
+        consumedAt: new Date(),
+      },
+    },
+    {
+      new: true,
+    },
+  ).exec();
+
+  if (!consumed) {
+    throw new UnauthorizedException(
+      'Invalid verification code',
+    );
+  }
+
+  if (consumed.attemptId) {
+    await this.attempts.complete(
+      consumed.attemptId,
+      'otp',
+    );
+  }
+
+  return {
+    authenticated: true,
+    userId: consumed.userId,
+  };
+}
+
     private generateCode(): string {
       return Math.floor(
         100000 + Math.random() * 900000,

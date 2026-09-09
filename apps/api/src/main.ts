@@ -1,28 +1,65 @@
-import { NestFactory } from '@nestjs/core';
-import { ValidationPipe, VersioningType } from '@nestjs/common';
+import {
+  ValidationPipe,
+} from '@nestjs/common';
+import {
+  NestFactory,
+} from '@nestjs/core';
+import helmet from 'helmet';
+
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: true });
-  app.enableVersioning({
-    type: VersioningType.URI,
-    defaultVersion: '1',
-    prefix: 'api/v',
-  });
-  app.useGlobalPipes(
-    new ValidationPipe({
-      transform: true,
-      whitelist: true,
-      forbidNonWhitelisted: true,
+  const app =
+    await NestFactory.create(
+      AppModule,
+    );
+
+  app.use(
+    helmet({
+      contentSecurityPolicy: false,
     }),
   );
 
   app.enableCors({
-    origin: true,
+    origin: (
+      process.env.FRONTEND_URL ??
+      'http://localhost:3001'
+    ),
     credentials: true,
+    methods: [
+      'GET',
+      'POST',
+      'PUT',
+      'PATCH',
+      'DELETE',
+      'OPTIONS',
+    ],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'X-Request-ID',
+      'X-Device-Fingerprint',
+    ],
   });
-  
-  await app.listen(process.env.PORT || 3000);
+
+  app.setGlobalPrefix('api');
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+      transformOptions: {
+        enableImplicitConversion: false,
+      },
+    }),
+  );
+
+  await app.listen(
+    Number(
+      process.env.PORT ?? 3000,
+    ),
+  );
 }
 
-bootstrap();
+void bootstrap();
