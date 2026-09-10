@@ -56,8 +56,7 @@ export class SecurityEvent {
   ipHash?: string;
 
   @Prop({
-    required: true,
-    index: true,
+    required: true
   })
   requestId!: string;
 

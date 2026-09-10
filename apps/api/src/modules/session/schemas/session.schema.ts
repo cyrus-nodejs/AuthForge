@@ -16,7 +16,7 @@ export class Session {
   @Prop({ type: Types.ObjectId, ref: 'User', required: true, index: true })
   userId!: Types.ObjectId;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   tokenFamilyId!: string;
 
   @Prop({ required: true })
@@ -37,7 +37,7 @@ export class Session {
   @Prop({ required: true })
   lastActivityAt!: Date;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   expiresAt!: Date;
 
   @Prop()

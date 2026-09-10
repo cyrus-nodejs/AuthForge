@@ -22,7 +22,7 @@ export class RefreshToken {
   @Prop({ required: true, index: true })
   sessionId!: string;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   tokenFamilyId!: string;
 
   @Prop({ type: Types.ObjectId, ref: 'RefreshToken', index: true })
@@ -34,7 +34,7 @@ export class RefreshToken {
   @Prop({ required: true, default: 'active' })
   status!: string;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   expiresAt!: Date;
 
   @Prop()

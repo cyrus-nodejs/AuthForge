@@ -113,7 +113,7 @@ import {
   
     try {
       const response =
-        await authFortClient.request(
+        await authFortClient.rawRequest(
           '/auth/google/callback',
           {
             method: 'POST',

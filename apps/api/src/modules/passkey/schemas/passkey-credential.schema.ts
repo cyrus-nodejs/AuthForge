@@ -11,10 +11,10 @@ export type PasskeyCredentialDocument =
 export class PasskeyCredential {
   _id!: Types.ObjectId;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true,  })
   userId!: Types.ObjectId;
 
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true})
   credentialId!: string;
 
   @Prop({ required: true })

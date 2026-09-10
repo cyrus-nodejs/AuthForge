@@ -3,7 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { envConfig } from './config/env.config';
+
 import {
   APP_GUARD,
 } from '@nestjs/core';
@@ -44,12 +44,9 @@ import { OtpController } from './modules/otp/otp.controller';
 import { TokenController } from './modules/token/token.controller';
 
 @Module({
+  
   imports: [
-    ConfigModule.forRoot({
-      load: [envConfig],
-      envFilePath: '.env',
-      isGlobal: true,
-    }),
+     AppConfigModule,
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -57,8 +54,6 @@ import { TokenController } from './modules/token/token.controller';
       }),
       inject: [ConfigService],
     }),
- 
-    AppConfigModule,
     DatabaseModule,
     RedisModule,
     SecurityModule,

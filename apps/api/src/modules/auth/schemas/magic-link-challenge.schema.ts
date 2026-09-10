@@ -29,7 +29,7 @@ export class MagicLinkChallenge {
   @Prop({ required: true, default: 'active' })
   status!: string;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   expiresAt!: Date;
 
   @Prop()

@@ -1,183 +1,141 @@
-import 'server-only';
-
 import {
-  authConfig,
-} from './config';
+  cookies,
+  headers,
+} from 'next/headers';
 
-import {
-  getAccessToken,
-  getRefreshToken,
-} from './cookies';
+const API_URL =
+  process.env.AUTHFORT_API_URL!;
 
-import type {
-  ApiResponse,
-  TokenResponse,
-} from './contracts';
-
-export class AuthFortApiError
-  extends Error {
-  constructor(
-    public readonly status: number,
-    public readonly code: string,
-    message: string,
-    public readonly requestId?: string,
-    public readonly details?: unknown,
-  ) {
-    super(message);
-    this.name =
-      'AuthFortApiError';
-  }
-}
-
-interface RequestOptions
-  extends RequestInit {
-  authenticated?: boolean;
+type AuthRequestInit = RequestInit & {
   refreshable?: boolean;
-}
+};
 
-export class AuthFortClient {
+class AuthFortClient {
+  private async buildRequest(
+    path: string,
+    init: AuthRequestInit = {},
+  ): Promise<Response> {
+
+    const {
+      refreshable: _refreshable,
+      ...requestInit
+    } = init;
+
+    const cookieStore =
+      await cookies();
+
+    const headerStore =
+      await headers();
+
+    const requestId =
+      headerStore.get(
+        'x-request-id',
+      );
+
+    const fingerprint =
+      headerStore.get(
+        'x-auth-fingerprint',
+      );
+
+    const cookieHeader =
+      cookieStore
+        .getAll()
+        .map(
+          cookie =>
+            `${cookie.name}=${cookie.value}`,
+        )
+        .join('; ');
+
+    return fetch(
+      `${API_URL}${path}`,
+      {
+        ...init,
+        headers: {
+          accept:
+            'application/json',
+
+          ...(cookieHeader
+            ? {
+                cookie:
+                  cookieHeader,
+              }
+            : {}),
+
+          ...(requestId
+            ? {
+                'x-request-id':
+                  requestId,
+              }
+            : {}),
+
+          ...(fingerprint
+            ? {
+                'x-auth-fingerprint':
+                  fingerprint,
+              }
+            : {}),
+
+          ...(init.headers ?? {}),
+        },
+        cache: 'no-store',
+      },
+    );
+  }
+
   async request<T>(
     path: string,
-    options: RequestOptions = {},
+    init: AuthRequestInit = {},
   ): Promise<T> {
-    const {
-      authenticated = false,
-      refreshable = true,
-      headers,
-      ...init
-    } = options;
-
-    const requestHeaders =
-      new Headers(headers);
-
-    requestHeaders.set(
-      'content-type',
-      'application/json',
-    );
-
-    if (authenticated) {
-      const token =
-        await getAccessToken();
-
-      if (!token) {
-        throw new AuthFortApiError(
-          401,
-          'AUTHENTICATION_REQUIRED',
-          'Authentication required',
-        );
-      }
-
-      requestHeaders.set(
-        'authorization',
-        `Bearer ${token}`,
-      );
-    }
-
     const response =
-      await fetch(
-        `${authConfig.apiBaseUrl}${path}`,
+      await this.buildRequest(
+        path,
+        init,
+      );
+
+    if (!response.ok) {
+      const errorBody =
+        await response.json().catch(
+          () => null,
+        );
+
+      throw Object.assign(
+        new Error(
+          errorBody?.message ??
+            `AuthFort request failed: ${response.status}`,
+        ),
         {
-          ...init,
-          headers: requestHeaders,
-          cache: 'no-store',
+          status: response.status,
+          code: errorBody?.code,
         },
       );
-
-    const payload =
-      (await response.json()) as
-        | ApiResponse<T>
-        | undefined;
-
-    if (
-      response.ok &&
-      payload?.success
-    ) {
-      return payload.data;
     }
 
-    const failure =
-      payload && !payload.success
-        ? payload
-        : undefined;
-
-    throw new AuthFortApiError(
-      response.status,
-      failure?.error.code ??
-        'AUTHFORT_API_ERROR',
-      failure?.error.message ??
-        'Authentication request failed',
-      failure?.error.requestId ??
-        response.headers.get(
-          'x-request-id',
-        ) ??
-        undefined,
-      failure?.error.details,
-    );
+    return response.json() as Promise<T>;
   }
 
-  async refresh() {
-    const token =
-      await getRefreshToken();
-
-    if (!token) {
-      throw new AuthFortApiError(
-        401,
-        'REFRESH_TOKEN_MISSING',
-        'Refresh token missing',
-      );
-    }
-
-    return this.request<TokenResponse>(
-      '/auth/token/refresh',
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          refreshToken: token,
-        }),
-        refreshable: false,
-      },
+  async rawRequest(
+    path: string,
+    init: AuthRequestInit = {},
+  ): Promise<Response> {
+    return this.buildRequest(
+      path,
+      init,
     );
   }
 
   async authenticatedRequest<T>(
     path: string,
-    options: Omit<
-      RequestOptions,
-      'authenticated'
-    > = {},
-  ) {
-    try {
-      return await this.request<T>(
-        path,
-        {
-          ...options,
-          authenticated: true,
+    init: RequestInit = {},
+  ): Promise<T> {
+    return this.request<T>(
+      path,
+      {
+        ...init,
+        headers: {
+          ...(init.headers ?? {}),
         },
-      );
-    } catch (error) {
-      if (
-        error instanceof
-          AuthFortApiError &&
-        error.status === 401
-      ) {
-        if (options.refreshable === false) {
-          throw error;
-        }
-
-        await this.refresh();
-
-        return this.request<T>(
-          path,
-          {
-            ...options,
-            authenticated: true,
-            refreshable: false,
-          },
-        );
-      }
-
-      throw error;
-    }
+      },
+    );
   }
 }
 

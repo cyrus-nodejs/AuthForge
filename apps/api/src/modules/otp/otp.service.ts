@@ -146,12 +146,8 @@ import {
     );
   }
 
-  /*
-   * Atomically consume the challenge.
-   *
-   * If another request already consumed it, this
-   * query returns null.
-   */
+
+  
   const consumed = await this.model.findOneAndUpdate(
     {
       _id: challenge._id,

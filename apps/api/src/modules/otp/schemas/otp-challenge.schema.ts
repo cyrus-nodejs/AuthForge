@@ -34,7 +34,7 @@ export class OtpChallenge {
   @Prop({ required: true, default: 5 })
   maxAttempts!: number;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true})
   expiresAt!: Date;
 
   @Prop()

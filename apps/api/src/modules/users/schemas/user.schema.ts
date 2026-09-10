@@ -19,7 +19,7 @@ export class User {
   @Prop({ required: true, trim: true })
   email!: string;
 
-  @Prop({ required: true, unique: true, index: true })
+  @Prop({ required: true})
   emailNormalized!: string;
 
   @Prop({ trim: true, maxlength: 120 })

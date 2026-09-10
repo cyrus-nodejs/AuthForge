@@ -104,6 +104,27 @@ export class SessionService {
     return session;
   }
 
+  async touch(sessionId: string) {
+  return this.model
+    .updateOne(
+      {
+        sessionId,
+        revokedAt: {
+          $exists: false,
+        },
+        expiresAt: {
+          $gt: new Date(),
+        },
+      },
+      {
+        $set: {
+          lastActivityAt: new Date(),
+        },
+      },
+    )
+    .exec();
+}
+
   async revoke(
     sessionId: string,
     reason = 'manual_logout',

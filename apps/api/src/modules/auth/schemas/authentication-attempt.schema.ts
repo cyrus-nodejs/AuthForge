@@ -55,7 +55,7 @@ export class AuthenticationAttempt {
   @Prop()
   userAgentHash?: string;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   expiresAt!: Date;
 
   @Prop()

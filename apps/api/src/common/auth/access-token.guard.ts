@@ -110,7 +110,7 @@ import {
       if (
         requiredLevel &&
         !this.satisfiesLevel(
-          claims.authenticationLevel,
+              claims.aal,
           requiredLevel,
         )
       ) {
@@ -124,7 +124,7 @@ import {
         sessionId: claims.sid,
         securityVersion: claims.ver,
         authenticationLevel:
-          claims.authenticationLevel,
+            claims.aal,
         jti: claims.jti,
       };
   

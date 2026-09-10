@@ -6,7 +6,7 @@ import {
 } from './schemas/session.schema';
 import { SessionService } from './session.service';
 import { SessionController } from './session.controller';
-import { TokenModule } from '../token/token.module';
+import { AccessTokenModule } from '../token/access-token.module'; 
 import { UsersModule } from '../users/users.module';
 import { SecurityEventModule } from '../security-events/security-event.module';
 
@@ -18,7 +18,7 @@ import { SecurityEventModule } from '../security-events/security-event.module';
         schema: SessionSchema,
       },
     ]),
-    TokenModule,
+    AccessTokenModule,
     UsersModule,
     SecurityEventModule,
   ],

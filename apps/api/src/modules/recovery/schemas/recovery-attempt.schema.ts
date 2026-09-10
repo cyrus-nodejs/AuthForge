@@ -32,7 +32,7 @@ export class RecoveryAttempt {
   @Prop({ default: 'pending', index: true })
   status!: string;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   expiresAt!: Date;
 
   @Prop()

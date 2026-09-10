@@ -1,5 +1,3 @@
-import { randomUUID } from 'node:crypto';
-
 export function createRequestId(
   incoming?: string | null,
 ): string {
@@ -10,5 +8,5 @@ export function createRequestId(
     return incoming;
   }
 
-  return randomUUID();
+  return crypto.randomUUID();
 }

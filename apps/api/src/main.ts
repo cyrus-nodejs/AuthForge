@@ -42,7 +42,7 @@ async function bootstrap() {
     ],
   });
 
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix('api/v1');
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -57,7 +57,7 @@ async function bootstrap() {
 
   await app.listen(
     Number(
-      process.env.PORT ?? 3000,
+      process.env.PORT ?? 3001,
     ),
   );
 }

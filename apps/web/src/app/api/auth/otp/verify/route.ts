@@ -9,18 +9,18 @@ import {
   import {
     body,
   } from '@/lib/auth/request';
-  
-  import {
-    authResponse,
-    error,
-  } from '@/lib/auth/bff-response';
+ 
   
   import type {
     OtpVerifyResponse,
   } from '@/lib/auth/contracts';
-  
+  import {
+  json,
+  error,
+} from '@/lib/auth/bff-response';
+
   interface OtpVerifyRequest {
-    attemptId: string;
+    challengeId: string;
     code: string;
   }
   
@@ -34,17 +34,15 @@ import {
         );
   
       const result =
-        await authFortClient.request<OtpVerifyResponse>(
-          '/auth/otp/verify',
-          {
-            method: 'POST',
-            body: JSON.stringify(
-              input,
-            ),
-          },
-        );
-  
-      return authResponse(result);
+  await authFortClient.request<OtpVerifyResponse>(
+    '/auth/otp/verify',
+    {
+      method: 'POST',
+      body: JSON.stringify(input),
+    },
+  );
+
+return json(result);
     } catch (cause) {
       return error(cause);
     }
