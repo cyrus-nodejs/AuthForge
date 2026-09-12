@@ -26,7 +26,7 @@ export function AuthRouteGuard({
     useAuth(
       state => state.status,
     );
-
+const auth = useAuth;
   useEffect(() => {
     if (
       status ===

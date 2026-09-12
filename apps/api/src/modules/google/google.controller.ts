@@ -5,42 +5,53 @@ import {
     Res,
   } from '@nestjs/common';
   import type { Response } from 'express';
+  
   import { GoogleService } from './google.service';
+  import {
+    GoogleAuthenticationService,
+  } from './google-authentication.service';
   
   @Controller('auth/google')
   export class GoogleController {
     constructor(
-      private readonly google: GoogleService,
+      private readonly google:
+        GoogleService,
+      private readonly authentication:
+        GoogleAuthenticationService,
     ) {}
   
     @Get()
-    async start(@Res() response: Response) {
-      const url =
-        await this.google.createAuthorizationUrl();
-  
-      return response.redirect(url);
+    async start(
+      @Res() response: Response,
+    ) {
+      return response.redirect(
+        await this.google.createAuthorizationUrl(),
+      );
     }
   
     @Get('callback')
     async callback(
       @Query('code') code: string,
       @Query('state') state: string,
-      @Res() response: Response,
     ) {
-      const user =
-        await this.google.authenticate(
+      if (!code || !state) {
+        return {
+          success: false,
+          error: {
+            code: 'INVALID_OAUTH_CALLBACK',
+          },
+        };
+      }
+  
+      const tokens =
+        await this.authentication.authenticate(
           code,
           state,
         );
   
-      const frontend =
-        process.env.FRONTEND_URL ??
-        'http://localhost:3001';
-  
-      return response.redirect(
-        `${frontend}/auth/google/success?userId=${encodeURIComponent(
-          user._id.toString(),
-        )}`,
-      );
+      return {
+        success: true,
+        data: tokens,
+      };
     }
   }
