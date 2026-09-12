@@ -1,8 +1,8 @@
-# OpenAuth
+# AuthFort
 
 **Passwordless, adaptive authentication platform built with NestJS, MongoDB, Redis, and Next.js.**
 
-OpenAuth provides a secure authentication foundation centered around passwordless authentication, adaptive risk-based challenges, passkeys, Google OAuth, trusted-device fingerprinting, session protection, and refresh-token reuse detection.
+AuthFort provides a secure authentication foundation centered around passwordless authentication, adaptive risk-based challenges, passkeys, Google OAuth, trusted-device fingerprinting, session protection, and refresh-token reuse detection.
 
 The repository is structured as a **pnpm monorepo** containing the authentication API and the Next.js web application.
 
@@ -11,7 +11,7 @@ The repository is structured as a **pnpm monorepo** containing the authenticatio
 ## Architecture
 
 ```text
-OpenAuth/
+AuthFort/
 ├── api/                         # NestJS authentication API
 │   ├── src/
 │   │   ├── core/
@@ -50,7 +50,7 @@ OpenAuth/
 
 ## Core principles
 
-OpenAuth is designed around the following principles:
+AuthFort is designed around the following principles:
 
 * Passwordless authentication by default.
 * Adaptive authentication based on authentication risk.
@@ -86,7 +86,7 @@ After authentication, the backend can trigger a passkey-registration prompt.
 
 ## Passwordless login
 
-OpenAuth does not rely on traditional passwords.
+AuthFort does not rely on traditional passwords.
 
 Depending on risk and account state, login can use:
 
@@ -185,7 +185,7 @@ Google authorization
 OAuth callback
    │
    ▼
-OpenAuth API
+AuthFort API
    │
    ▼
 User authentication
@@ -208,7 +208,7 @@ OAuth return URLs are restricted to internal relative paths to prevent open redi
 
 # Passkeys / WebAuthn
 
-OpenAuth supports WebAuthn/passkeys.
+AuthFort supports WebAuthn/passkeys.
 
 The backend controls:
 
@@ -321,7 +321,7 @@ The Next.js application acts as a **Backend-for-Frontend (BFF)**.
        │ access/refresh credentials
        ▼
 ┌──────────────┐
-│   OpenAuth   │
+│   AuthFort   │
 │     API      │
 └──────┬───────┘
        │
@@ -373,7 +373,7 @@ GET/HEAD/OPTIONS requests are treated as safe methods.
 
 # Request IDs
 
-OpenAuth propagates request IDs across the authentication boundary.
+AuthFort propagates request IDs across the authentication boundary.
 
 ```text
 Browser
@@ -384,7 +384,7 @@ Next.js BFF
    │
    │ x-request-id
    ▼
-OpenAuth API
+AuthFort API
    │
    ▼
 Security events / logs
@@ -599,7 +599,7 @@ GOOGLE_CLIENT_ID
 GOOGLE_CLIENT_SECRET
 GOOGLE_CALLBACK_URL
 
-OpenAuth_API_URL
+AuthFort_API_URL
 
 SESSION_SECRET
 ```
@@ -862,7 +862,7 @@ The exact scripts should follow the repository's package-manager configuration.
 
 # Local infrastructure
 
-OpenAuth requires:
+AuthFort requires:
 
 ```text
 MongoDB
@@ -917,7 +917,7 @@ Before production deployment:
 
 # Threat model
 
-OpenAuth is specifically designed to mitigate common passwordless authentication threats.
+AuthFort is specifically designed to mitigate common passwordless authentication threats.
 
 | Threat                            | Mitigation                        |
 | --------------------------------- | --------------------------------- |
@@ -1002,7 +1002,7 @@ The project should not generate ZIP archives or downloadable project bundles.
 
 # Contract hierarchy
 
-OpenAuth uses four primary contracts:
+AuthFort uses four primary contracts:
 
 ```text
 api contract.md
@@ -1041,7 +1041,7 @@ Implementation should remain consistent with all four contracts.
 
 # Status
 
-OpenAuth currently contains the architecture for:
+AuthFort currently contains the architecture for:
 
 * Passwordless signup.
 * Passwordless login.

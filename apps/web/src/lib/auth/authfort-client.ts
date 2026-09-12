@@ -2,10 +2,13 @@ import {
   cookies,
   headers,
 } from 'next/headers';
+import type {
+  TokenResponse,
+} from './contracts';
 
 const API_URL =
   process.env.AUTHFORT_API_URL!;
-
+console.log(API_URL)
 type AuthRequestInit = RequestInit & {
   refreshable?: boolean;
 };
@@ -137,6 +140,17 @@ class AuthFortClient {
       },
     );
   }
+
+  async refresh(): Promise<TokenResponse> {
+  return this.request<TokenResponse>(
+    '/auth/token/refresh',
+    {
+      method: 'POST',
+        refreshable: false,
+    },
+  );
+}
+
 }
 
 export const authFortClient =

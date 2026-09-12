@@ -57,7 +57,7 @@ async function bootstrap() {
 
   await app.listen(
     Number(
-      process.env.PORT ?? 3001,
+      process.env.PORT ?? 4000,
     ),
   );
 }

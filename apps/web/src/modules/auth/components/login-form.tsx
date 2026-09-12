@@ -19,6 +19,9 @@ import {
 import {
   KeyRound,
   Mail,
+  Chrome,
+  ArrowRight,
+  Loader2,
 } from 'lucide-react';
 
 import {
@@ -124,14 +127,16 @@ export function LoginForm({
   }
 
   return (
-    <div className="space-y-5">
+    <div className="w-full space-y-6">
+      {/* Error */}
       <AuthError message={error} />
 
+      {/* Email authentication */}
       <form
         onSubmit={form.handleSubmit(
           submit,
         )}
-        className="space-y-5"
+        className="space-y-4"
       >
         <AuthInput
           id="email"
@@ -151,23 +156,26 @@ export function LoginForm({
           loading={
             form.formState.isSubmitting
           }
+          className="group"
         >
-          <Mail className="h-4 w-4" />
-          Continue with email
+          <Mail className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+          <span>Continue with email</span>
+          <ArrowRight className="ml-auto h-4 w-4 opacity-60 transition-all duration-200 group-hover:translate-x-0.5 group-hover:opacity-100" />
         </AuthButton>
       </form>
 
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-slate-200" />
-        </div>
-        <div className="relative flex justify-center">
-          <span className="bg-white px-3 text-xs text-slate-400">
-            or
-          </span>
-        </div>
+      {/* Divider */}
+      <div className="relative flex items-center py-1">
+        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-200 to-slate-200" />
+
+        <span className="mx-4 shrink-0 text-[11px] font-medium uppercase tracking-[0.16em] text-slate-400">
+          or continue with
+        </span>
+
+        <div className="h-px flex-1 bg-gradient-to-l from-transparent via-slate-200 to-slate-200" />
       </div>
 
+      {/* Google */}
       <button
         type="button"
         onClick={() =>
@@ -175,22 +183,78 @@ export function LoginForm({
             '/api/auth/google',
           )
         }
-        className="h-12 w-full rounded-xl border border-slate-200 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+        className={[
+          'group flex min-h-12 w-full items-center',
+          'justify-center gap-3 rounded-xl',
+          'border border-slate-200/90',
+          'bg-white px-5',
+          'text-sm font-semibold text-slate-700',
+          'shadow-sm shadow-slate-950/[0.03]',
+          'transition-all duration-200',
+          'hover:-translate-y-0.5',
+          'hover:border-slate-300',
+          'hover:bg-slate-50/80',
+          'hover:shadow-md hover:shadow-slate-950/[0.06]',
+          'active:translate-y-0 active:scale-[0.99]',
+          'focus:outline-none',
+          'focus-visible:ring-4 focus-visible:ring-slate-950/10',
+          'sm:min-h-[52px]',
+        ].join(' ')}
       >
-        Continue with Google
+        <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-100 bg-white shadow-sm">
+          <Chrome className="h-4 w-4 text-slate-700" />
+        </span>
+
+        <span>
+          Continue with Google
+        </span>
       </button>
 
+      {/* Passkey */}
       <button
         type="button"
         disabled={passkeyLoading}
         onClick={passkey}
-        className="flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-50"
+        className={[
+          'group flex min-h-12 w-full items-center',
+          'justify-center gap-3 rounded-xl',
+          'border border-slate-200/90',
+          'bg-slate-50/60 px-5',
+          'text-sm font-semibold text-slate-700',
+          'transition-all duration-200',
+          'hover:-translate-y-0.5',
+          'hover:border-slate-300',
+          'hover:bg-slate-100',
+          'hover:shadow-md hover:shadow-slate-950/[0.05]',
+          'active:translate-y-0 active:scale-[0.99]',
+          'focus:outline-none',
+          'focus-visible:ring-4 focus-visible:ring-slate-950/10',
+          'disabled:cursor-not-allowed',
+          'disabled:opacity-50',
+          'disabled:hover:translate-y-0',
+          'disabled:hover:shadow-none',
+          'sm:min-h-[52px]',
+        ].join(' ')}
       >
-        <KeyRound className="h-4 w-4" />
-        {passkeyLoading
-          ? 'Checking passkey…'
-          : 'Continue with passkey'}
+        {passkeyLoading ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-900 text-white shadow-sm">
+            <KeyRound className="h-3.5 w-3.5" />
+          </span>
+        )}
+
+        <span>
+          {passkeyLoading
+            ? 'Checking passkey…'
+            : 'Continue with passkey'}
+        </span>
       </button>
+
+      {/* Security hint */}
+      <p className="px-4 text-center text-[11px] leading-5 text-slate-400">
+        Secure authentication with no password required.
+      </p>
     </div>
   );
 }

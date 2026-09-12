@@ -13,6 +13,7 @@ import {
   import {
     authResponse,
     error,
+    json
   } from '@/lib/auth/bff-response';
   
   import type {
@@ -45,7 +46,7 @@ import {
           },
         );
   
-      return authResponse(result);
+      return json(result);
     } catch (cause) {
       return error(cause);
     }

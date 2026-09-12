@@ -58,7 +58,7 @@ import {
         : await request.text();
   
     const response =
-      await authFortClient.request(
+      await authFortClient.rawRequest(
         path,
         {
           method:

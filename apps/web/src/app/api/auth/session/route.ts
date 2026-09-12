@@ -19,7 +19,7 @@ import {
       enforceBffSecurity(request);
   
     const response =
-      await authFortClient.request(
+      await authFortClient.rawRequest(
         '/auth/session',
         {
           method: 'GET',

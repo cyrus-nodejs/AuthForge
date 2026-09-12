@@ -37,3 +37,20 @@ export interface OtpVerifyResponse {
   authenticated: boolean;
   userId?: string;
 }
+
+export interface RecoveryVerifyResponse {
+  verified: boolean;
+  userId: string;
+}
+
+export interface SignupResponse {
+  challengeId: string;
+  method: 'magic_link';
+  expiresAt: string;
+}
+
+export interface PasskeyVerifyResponse {
+  authenticated: boolean;
+  userId?: string;
+}
+
